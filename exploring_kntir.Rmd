@@ -16,6 +16,8 @@ We've already done this in the tour, but lets look at the data again.
   help(mtcars)
 ```
 
+## Tables
+
 Lets put some text in and display a table with the data. Add the following to your file.
 
 ```r
@@ -41,6 +43,8 @@ The table could be much improved though. Knitr doesn't handle tables so we need 
   `` `` ``
 
 ```
+
+The code chunk options here tell Knitr not to show the code, results, warnings or any messages. This makes for a cleaner document. We are allowing errors to be shown, just in case.
 
 
 
