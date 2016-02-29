@@ -2,9 +2,29 @@
 title: "Exploring Knitr"
 author: "Robert Olendorf"
 date: "February 26, 2016"
-output: html_document
+output: 
+  html_document:
+    theme: readable
+    toc: true
+    toc_float: true
 ---
 
+```{r, echo=FALSE, results='hide', warning=FALSE, message=FALSE, error=TRUE}
+  rinline <- function(code){
+    html <- '<code  class="r">``` `r CODE` ```</code>'
+    sub("CODE", code, html)
+  }
+  
+  if(!require("pander"))
+  {
+    install.packages("pander", repos="http://cran.rstudio.com/", dependencies = TRUE)
+  }
+  
+  library("pander", lib.loc="~/Library/R/3.2/library")
+
+```
+
+```
 In order to look at more of document creation with Knitr we'll approach the document more like a research project. We'll keep using Markdown, but LaTeX wouldn't be much different from a Knitr standpoint. Create a new project called **_mtcars_**, go ahead an make it a Git repository as well. Then create a new Markdown document called **_mtcars_**, and delete everythign out except the YAML front matter. Edit that to yoru liking.
 
 ## Looking At The Data
@@ -44,7 +64,151 @@ The table could be much improved though. Knitr doesn't handle tables so we need 
 
 ```
 
-The code chunk options here tell Knitr not to show the code, results, warnings or any messages. This makes for a cleaner document. We are allowing errors to be shown, just in case.
+The code chunk options here tell Knitr not to show the code, results, warnings or any messages. This makes for a cleaner document. We are allowing errors to be shown, just in case. 
+
+Next lets display the table. For the sake of brevity here I will forego all the iterations, but starting with the basic table in **Pander** we end up with the following. We've sliced off some fo the columns for display, aligned the row labels to the left, and added a caption. You can show all teh column, **Pander** nicely just breaks the table into parts for us. Play with the code chunk options to see what they do.
+
+```markdown
+  The **_mtcars_** data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). The data is shown below. 
+  
+  `` `` ``{r, mtcars-table}
+   car.data <- mtcars[, 1:8]
+   set.alignment(row.names = 'left')
+   pander(car.data, caption = "The first nine columns of mtcars")
+  `` `` ``
+```
+
+## Customization and Style
+
+### Bootstrap Themes
+
+We can change the look and feel easily by adding a theme. There are several themes shipped with Knitr, all drawing from the free *Bootswatch* themes derived from *Twitter Bootstrap*. At the time of writing the available themese are:
+
+  * default
+  * cerulean
+  * cosmo
+  * flatly
+  * journal
+  * lumen
+  * paper
+  * readable
+  * sandstone
+  * simplex
+  * spacelab
+  * united
+  * yeti
+  
+You can see demos at http://bootswatch.com/. To apply a theme, edit  your YAML front matter to look like this. If you enter a theme that isn't supported, you'll get a list of available themes which is handy. Try a few different themes.
+
+```yaml
+  ---
+  title: "Exploring Knitr In Cars"
+  author: "Robert Olendorf"
+  date: "February 26, 2016"
+  output: 
+    html_document:
+      theme: readable
+  ---
+```
+
+### CSS
+
+You can also add your own CSS styles. Just make a new file, and save it as **_custom.css_**. We'll add table striping to our table. First look at your document in Chrome or Firefox (they have the best developer tools). Right click on a table row and **_inspect_** it. You'll see that **_Pander_** has done a nice job of adding *.odd* and *.even* classes already. So all we have to do is use the right selector. Enter the following into your **_custom.css_**.
+
+```css
+  tr.even {
+    background-color: #cfcfcf;
+  }
+```
+
+This will select every even row and set the background color to a grey. Then we need to edit the YAML front mattter in our Markdown document so it looks like this.
+
+```yaml
+
+  ---
+  title: "Exploring Knitr In Cars"
+  author: "Robert Olendorf"
+  date: "February 26, 2016"
+  output: 
+    html_document:
+      theme: readable
+      css: custom.css
+  ---
+
+```
+
+This will override any CSS in our theme. If you wish to override all themes, including the default theme, just leave the theme blank, like below.
+
+```yaml
+ 
+  title: "Exploring Knitr In Cars"
+  author: "Robert Olendorf"
+  date: "February 26, 2016"
+  output: 
+    html_document:
+      theme: null
+      css: custom.css
+  
+```
+
+### Code Highlighting
+
+Code highlighting is controlled similarly. There are a number of themes you can use, as well as overriding it with your own CSS. As of writing this, Knitr comes with the following highlighting themes.
+
+ *default
+ * tango
+ * pygments
+ * kate
+ * monochrome
+ * espresso
+ * zenburn
+ * haddock
+ * textmate
+ 
+You must also specify the language when specifiying creating the code chunk. In most cases this will be R, but the syntax highler knows a wide variety of languages. You can see a list at https://support.codebasehq.com/articles/tips-tricks/syntax-highlighting-in-markdown. To change the highlighting theme edit the YAML front matter to be somethign like this.
+
+```yaml
+  title: "Exploring Knitr In Cars"
+  author: "Robert Olendorf"
+  date: "February 26, 2016"
+  output: 
+    html_document:
+      theme: readable
+      highlight: kate
+      css: custom.css
+```
+
+Then make sure  your code chunks have the appropriate language specifications.
+
+We can use **_Pander_** to format the results from a statistical analysis too. Add the following to your document.
+
+```{r}
+    mtcars.regression1 <- lm(mtcars$mpg ~ mtcars$wt)
+    pander(summary(mtcars.regression1))
+```
+
+
+## Figures
+
+We should also create a nice figure for this analysis. This is pretty easy in R. I build plots interactively, getting the basic ideas done first, then adding complexity. Lets start with the code below.
+
+```{r}
+  plot(mtcars$wt, mtcars$mpg)
+```
+
+We can do much much better. Lets add a title and axis labels.
+
+
+```{r}
+    plot(mtcars$wt, mtcars$mpg, main = "Mileage vs Weight", xlab = "Weight (1000s of pounds)", ylab = "MPG")
+```
+
+We can also add a regression line.
+
+```{r}
+plot(mtcars$wt, mtcars$mpg, main = "Mileage vs Weight", xlab = "Weight (1000s of pounds)", ylab = "MPG")
+  abline(mtcars.regression1, col="blue")
+```
 
 
 
