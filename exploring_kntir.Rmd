@@ -210,5 +210,14 @@ plot(mtcars$wt, mtcars$mpg, main = "Mileage vs Weight", xlab = "Weight (1000s of
   abline(mtcars.regression1, col="blue")
 ```
 
+We might also like to add another plot so that they are side by side. The the initial plot may not be side by side. Adjust the plot width in the code chunk options until they are side by side. Also, in most publications we wouldn't want to show the code. Here we turn echo to false.
+
+```{r, echo=FALSE, out.width="400px"}
+  plot(mtcars$wt, mtcars$mpg, main = "Mileage vs Weight", xlab = "Weight (1000s of pounds)", ylab = "MPG")
+  abline(mtcars.regression1, col="blue")
+  boxplot(mtcars$mpg, main="Distribution of Mileages")
+
+```
+
 
 
